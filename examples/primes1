@@ -1,0 +1,49 @@
+
+def primes
+{
+    def square x { return x * x; }
+
+    const FIRST_PRIMES = [2,3,5,7];
+    const FPRIMES_LEN = 4;
+    var fpos = 0;                      // position in FIRST_PRIMES
+
+    var curr;                          // current prime number
+    def next_prime
+    {
+        if fpos < FPRIMES_LEN {
+            curr = FIRST_PRIMES[fpos];
+            fpos = fpos + 1;
+            return curr;
+        }
+
+        loop {
+            curr = curr + 2;          // check next odd number
+
+            /*
+             * using a list of primes (geez, I wonder where we can find one)
+             * check up to the sqrt if any prime divides it
+             * if not it is prime, update curr and return
+             */
+            var prms = primes();      // recursion rocks...
+
+            // all numbers are prime until proven otherwise
+            var flag = true;          // is the number prime
+
+            var prm;
+            do {
+                prm = prms();         // get next prime number
+                if curr % prm == 0
+                    flag = false;
+            } while flag && square(prm) <= curr
+
+            if flag
+                return curr;
+        }
+    }
+
+    return next_prime;
+}
+
+const p = primes();
+loop print(p());
+

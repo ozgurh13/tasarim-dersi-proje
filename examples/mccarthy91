@@ -1,0 +1,27 @@
+/*
+ * McCarthy 91 function
+ *     https://en.wikipedia.org/wiki/McCarthy_91_function
+ *
+ * M(n) = n - 10       if n > 100
+ *      = M(M(n+11))   if n <= 100
+ */
+
+def M n
+{
+    if n > 100
+        return n - 10;
+    else
+        return M(M(n + 11));
+}
+
+assert(M(87) == 91);
+
+
+
+/*  lambda form  */
+M = \x -> ? x > 100
+          : x - 10
+          : M(M(x + 11));
+
+print(M(87));
+

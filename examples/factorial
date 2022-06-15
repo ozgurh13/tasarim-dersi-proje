@@ -1,0 +1,15 @@
+
+def factorial n
+{
+    def fact n acc
+    {
+        if n < 2
+            return acc;
+        return fact(n - 1, n * acc);
+    }
+
+    return fact(n, 1);
+}
+
+print(factorial(100));
+

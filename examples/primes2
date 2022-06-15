@@ -1,0 +1,113 @@
+
+def wheel2357
+{
+    var INTERVALS =
+        [ 2, 4, 2, 4, 6, 2, 6, 4
+        , 2, 4, 6, 6, 2, 6, 4, 2
+        , 6, 4, 6, 8, 4, 2, 4, 2
+        , 4, 8, 6, 4, 6, 2, 4, 6
+        , 2, 6, 6, 4, 2, 4, 6, 2
+        , 6, 4, 2, 4, 2,10, 2,10 ];
+    const LENGTH = 48;     // length of INTERVALS
+
+    var index = 0;         // current index
+
+    def next
+    {
+        var ret = INTERVALS[index];
+        index = (index + 1) % LENGTH;
+        return ret;
+    }
+
+    return next;
+}
+
+def scanl f x fxs
+{
+    var curr = x;
+    def next
+    {
+        var y = curr;
+        curr = f(curr, fxs());
+        return y;
+    }
+    return next;
+}
+
+
+def wheel
+{
+    var PRIMES = [2,3,5,7];
+    var index = 0;
+    var candidates = scanl(\x y -> x + y, 11, wheel2357());
+    def next
+    {
+        if index < 4 {
+            var ret = PRIMES[index];
+            index = index + 1;
+            return ret;
+        }
+
+        return candidates();
+    }
+
+    return next;
+}
+
+def primes
+{
+    def square x { return x * x; }
+
+    const FIRST_PRIMES = [2,3,5,7,11];
+    const FPRIMES_LEN = 5;
+    var fpos = 0;                         // position in FIRST_PRIMES
+
+    var curr;      // current prime number
+    def next_prime
+    {
+        if fpos < FPRIMES_LEN {
+            curr = FIRST_PRIMES[fpos];
+            fpos = fpos + 1;
+            return curr;
+        }
+
+        var start = curr - (curr - 11) % 210;      // find start position
+        var candidates = scanl(\x y -> x + y, start, wheel2357());
+
+        var tmp;   // find first number in wheel larger than curr
+        do tmp = candidates(); until tmp > curr
+
+        for curr = tmp
+          : /*  no condition  */
+          : curr = candidates()           // check next candidate
+         do {
+            /*
+             * using a list of possible primes
+             * check up to the sqrt if any divides it
+             * if not it is prime, update curr and return
+             */
+            var prms = wheel();        // 2-3-5-7 wheel
+
+            // all numbers are prime until proven otherwise
+            var flag = true;          // is the number prime
+
+            var prm;
+            do {
+                prm = prms();         // get next prime number
+
+                if curr % prm == 0    // then it's not prime
+                    flag = false;
+
+            } while flag && square(prm) <= curr
+
+            if flag     // then it's prime
+                return curr;
+        }
+    }
+
+    return next_prime;
+}
+
+const p = primes();
+loop print(p());
+

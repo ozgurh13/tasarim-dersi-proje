@@ -1,0 +1,53 @@
+/*
+ * Takahashi, D. (2000), "A fast algorithm for computing large Fibonacci numbers"
+ *     https://doi.org/10.1016/s0020-0190%2800%2900112-5
+ */
+
+def intlog base n
+{
+    var c = 0;
+    while n >= base { c = c + 1; n = n / base; }
+    return c;
+}
+const intlog2 = intlog(2);
+
+def takahashi n
+{
+    if n == 0
+        return 0;
+    if n < 3
+        return 1;
+
+    var temp, f = 1, l = 1, sign = -1;
+
+    var lg2n = intlog2(n) - 1;
+    for var i = lg2n : i > 0 : i = i - 1
+     do {
+        temp = f * f;
+        f = (f + l) >> 1;
+        f = 2 * (f * f) - 3 * temp - 2 * sign;
+
+        l = 5 * temp + 2 * sign;
+
+        sign = 1;
+        if (n >> i) % 2 == 1 {
+            temp = f;
+            f = (f + l) >> 1;
+            l = f + 2 * temp;
+
+            sign = -1;
+        }
+    }
+
+    if n % 2 == 0        // if n is even
+        f = f * l;
+    else {               //  if n is odd
+        f = (f + l) >> 1;
+        f = f * l - sign;
+    }
+
+    return f;
+}
+
+print(takahashi(40));
+
